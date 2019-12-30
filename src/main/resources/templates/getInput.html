@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Clean Strike</title>
+    <script>
+    function getCookie(cname) {
+          var name = cname + "=";
+          var decodedCookie = decodeURIComponent(document.cookie);
+          var ca = decodedCookie.split(';');
+          for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        }
+
+    function changeNextPlayer(){
+          if(getCookie("nextplayer") == getCookie("player1"))
+            document.cookie = "nextplayer = " + getCookie("player2");
+          else
+            document.cookie = "nextplayer = " + getCookie("player1");
+        }
+    </script>
+</head>
+<body>
+<h2 th:text="'What was your outcome ? Mr ' + ${nextplayer}"/>
+
+<form action="/play">
+    <h2>Red coins</h2>
+    <select name="redcoins">
+        <option value="null">None</option>
+        <option value="1">One</option>
+    </select>
+
+    <h2>Black coins</h2>
+    <select name="blackcoins">
+        <option value="null">None</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+    </select>
+
+    <h2>Striker pocketed</h2>
+    <select name="striker">
+        <option value="null">None</option>
+        <option value="1">Foul</option>
+    </select>
+    <h2>Coin thrown out</h2>
+    <select name="defunct">
+        <option value="null">None</option>
+        <option value="red">RED</option>
+        <option value="balck">BLACK</option>
+    </select>
+    <br><br>
+    <input type="submit" value="Enter" onclick="changeNextPlayer()">
+</form>
+
+</body>
+</html>

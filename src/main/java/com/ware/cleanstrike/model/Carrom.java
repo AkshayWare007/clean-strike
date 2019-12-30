@@ -1,6 +1,5 @@
 package com.ware.cleanstrike.model;
 
-import com.ware.cleanstrike.service.Player;
 import lombok.Data;
 
 @Data
@@ -12,7 +11,7 @@ public class Carrom {
 
     public Carrom(String player1name, String player2name) {
         firstplayer.playername = player1name;
-        secondplayer.playername= player2name;
+        secondplayer.playername = player2name;
     }
 
     public void removeQueen() {

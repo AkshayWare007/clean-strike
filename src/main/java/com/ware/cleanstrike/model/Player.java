@@ -1,4 +1,4 @@
-package com.ware.cleanstrike.service;
+package com.ware.cleanstrike.model;
 
 import com.ware.cleanstrike.model.Carrom;
 import com.ware.cleanstrike.model.Outcome;
@@ -7,12 +7,17 @@ import java.util.Vector;
 
 import static com.ware.cleanstrike.model.Constants.*;
 
-public class Player  Carrom {
+public class Player{
     public String playername;
-    int playerscore = 0;
-    int foulcount = 0;
-    Vector<Boolean> last3score = new Vector<>(3);
+    int playerscore;
+    int foulcount;
+    Vector<Boolean> last3score;
 
+    public Player(int playerscore, int foulcount, Vector<Boolean> last3score){
+        this.playerscore = playerscore;
+        this.foulcount = foulcount;
+        this.last3score = last3score;
+    }
     public void calculateScore(Outcome outcome) {
         int score = 0;
         int numberofcoins = 1;
@@ -45,9 +50,10 @@ public class Player  Carrom {
                 numberofcoins = 0;
         }
         updateScore(score);
-        updateCarromCoins(numberofcoins, outcome.getCoincolor());
-        if (foulcount > 3) {
+        //updateCarromCoins(numberofcoins, outcome.getCoincolor());
+        if (foulcount == 3) {
             this.playerscore -= 1;
+            foulcount = 0;
         }
     }
 
@@ -56,13 +62,5 @@ public class Player  Carrom {
         if (last3score.size() >= 3)
             last3score.remove(0);
         last3score.add(currentscore >= 1);
-    }
-
-    @Override
-    public void updateCarromCoins(int numberofcoins, String coincolor) {
-        if (coincolor.equals("BLACK")) {
-            this.blackcoincount -= numberofcoins;
-        } else if (coincolor.equals("RED"))
-            removeQueen();
     }
 }
