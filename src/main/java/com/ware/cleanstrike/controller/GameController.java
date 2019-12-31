@@ -1,6 +1,9 @@
 package com.ware.cleanstrike.controller;
 
+import com.ware.cleanstrike.model.Carrom;
 import com.ware.cleanstrike.model.Player;
+import com.ware.cleanstrike.service.scoreComputingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -18,15 +21,18 @@ import java.util.Vector;
 public class GameController {
     Map<String, Vector<Boolean>> clientscore = new HashMap<>();
 
+    @Autowired
+    scoreComputingService scoreComputingService;
+
     @GetMapping("/startgame")
     public String startGame(HttpServletRequest request, HttpServletResponse response, @CookieValue(value = "nextplayer", defaultValue = "Akshay") String nextplayer, Model model){
         String player1name = request.getParameter("player1name");
         String player2name = request.getParameter("player2name");
 
-        System.out.println(player1name);
-        System.out.println(player2name);
+        clientscore.put("player1name", new Vector<>(3));
+        clientscore.put("player2name", new Vector<>(3));
 
-        model.addAttribute("nextplayer", nextplayer);
+        model.addAttribute("nextplayer", player1name);
 
         response.addCookie(new Cookie("player1name", player1name));
         response.addCookie(new Cookie("player1score", "0"));
@@ -44,20 +50,38 @@ public class GameController {
     }
 
     @GetMapping("/play")
-    public String computeScore(HttpServletRequest request, @CookieValue(value = "nextplayer", defaultValue = "Akshay") String nextplayer, Model model) {
+    public String computeScore(HttpServletRequest request, HttpServletResponse response, @CookieValue(value = "nextplayer", defaultValue = "Akshay") String nextplayer, Model model) {
         Map<String, String> cookiemap = new HashMap<>();
         Cookie[] cookies = request.getCookies();
         Arrays.stream(cookies).forEach(c-> cookiemap.put(c.getName(), c.getValue()));
 
-        if(cookiemap.get("nextplayer").equals(cookiemap.get("player1name"))){
+        int blackcoincount = Integer.parseInt(cookiemap.get("blackcoincount"));
+        int redcoincount = Integer.parseInt(cookiemap.get("redcoincount"));
+        Carrom carrom = new Carrom(blackcoincount, redcoincount);
+
+        if(nextplayer.equals(cookiemap.get("player2name"))){
             int score = Integer.parseInt(cookiemap.get("player1score"));
             int foulcount = Integer.parseInt(cookiemap.get("player1foulcount"));
-            Player player = new Player(score, foulcount, clientscore.get("player1name"));
-
+            Player player = new Player(score, foulcount, clientscore.get("player1name"), carrom);
+            scoreComputingService.computeScore(player, request);
+            clientscore.put("player1name", player.last3score);
+            model.addAttribute("nextplayer", cookiemap.get("player2name"));
+            response.addCookie(new Cookie("player1score", String.valueOf(player.playerscore)));
+            response.addCookie(new Cookie("player1foulcount", String.valueOf(player.foulcount)));
         }
-        System.out.println(request.getParameter("redcoins"));
-        System.out.println(request.getParameter("blackcoins"));
-        model.addAttribute("nextplayer", nextplayer);
+        else if(nextplayer.equals(cookiemap.get("player1name"))) {
+            int score = Integer.parseInt(cookiemap.get("player2score"));
+            int foulcount = Integer.parseInt(cookiemap.get("player2foulcount"));
+            Player player = new Player(score, foulcount, clientscore.get("player2name"), carrom);
+            scoreComputingService.computeScore(player, request);
+            clientscore.put("player2name", player.last3score);
+            model.addAttribute("nextplayer", cookiemap.get("player1name"));
+            response.addCookie(new Cookie("player2score", String.valueOf(player.playerscore)));
+            response.addCookie(new Cookie("player2foulcount", String.valueOf(player.foulcount)));
+        }
+        response.addCookie(new Cookie("blackcoincount", String.valueOf(carrom.blackcoincount)));
+        response.addCookie(new Cookie("redcoincount", String.valueOf(carrom.redcoincount)));
+        //TODO Check player has won
         return "getInput";
     }
 }

@@ -20,10 +20,10 @@
         }
 
     function changeNextPlayer(){
-          if(getCookie("nextplayer") == getCookie("player1"))
-            document.cookie = "nextplayer = " + getCookie("player2");
+          if(getCookie("nextplayer") == getCookie("player1name"))
+            document.cookie = "nextplayer = " + getCookie("player2name");
           else
-            document.cookie = "nextplayer = " + getCookie("player1");
+            document.cookie = "nextplayer = " + getCookie("player1name");
         }
     </script>
 </head>
@@ -66,5 +66,27 @@
     <input type="submit" value="Enter" onclick="changeNextPlayer()">
 </form>
 
+<p>Black       Red</p>
+<h3 id="carrom"></h3>
+<script>
+    var x = getCookie("blackcoincount");
+    var y = getCookie("redcoincount");
+
+    document.getElementById("carrom").innerHTML = x + " "+ y;
+</script>
+<p id="players"></p>
+<script>
+    var x = getCookie("player1name");
+    var y = getCookie("player2name");
+
+    document.getElementById("players").innerHTML = x + " "+ y;
+</script>
+<h3 id="scores"></h3>
+<script>
+    var x = getCookie("player1score");
+    var y = getCookie("player2score");
+
+    document.getElementById("scores").innerHTML = x + " "+ y;
+</script>
 </body>
 </html>
